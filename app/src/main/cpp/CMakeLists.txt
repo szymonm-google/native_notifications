@@ -9,6 +9,8 @@ cmake_minimum_required(VERSION 3.18.1)
 
 project("nativenotifications")
 
+file(GLOB_RECURSE native_wrappers CONFIGURE_DEPENDS "native_wrappers/*.cpp" "native_wrappers/*.cc")
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
@@ -21,7 +23,9 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        native-lib.cpp)
+        native-lib.cpp
+        ${native_wrappers}
+        )
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -36,6 +40,8 @@ find_library( # Sets the name of the path variable.
         # you want CMake to locate.
         log)
 
+find_package(com.google.android.gms.gni.c REQUIRED CONFIG)
+
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
@@ -43,6 +49,12 @@ find_library( # Sets the name of the path variable.
 target_link_libraries( # Specifies the target library.
         nativenotifications
 
+        PUBLIC com.google.android.gms.gni.c::gni_shared
+
         # Links the target library to the log library
         # included in the NDK.
         ${log-lib})
+
+include_directories(./)
+include_directories(./native_wrappers/c)
+include_directories(./native_wrappers/cpp)

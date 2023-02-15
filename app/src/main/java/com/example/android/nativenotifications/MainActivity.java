@@ -3,7 +3,6 @@ package com.example.android.nativenotifications;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.widget.TextView;
 
 import com.example.android.nativenotifications.databinding.ActivityMainBinding;
 
@@ -23,14 +22,12 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Example of a call to a native method
-        TextView tv = binding.sampleText;
-        tv.setText(stringFromJNI());
+        showNotification(R.mipmap.ic_launcher);
     }
 
     /**
      * A native method that is implemented by the 'nativenotifications' native library,
      * which is packaged with this application.
      */
-    public native String stringFromJNI();
+    public native void showNotification(int icon_id);
 }

@@ -4,7 +4,11 @@ plugins {
 
 android {
     namespace 'com.example.android.nativenotifications'
-    compileSdk 32
+    compileSdk 33
+
+    buildFeatures {
+        prefab true
+    }
 
     defaultConfig {
         applicationId "com.example.android.nativenotifications"
@@ -14,6 +18,12 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_STL=c++_shared'
+            }
+        }
     }
 
     buildTypes {
@@ -40,6 +50,7 @@ android {
 dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.gms:play-services-gni-native-c:1.0.0-beta2'
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     testImplementation 'junit:junit:4.13.2'
