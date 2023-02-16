@@ -3,7 +3,6 @@
 
 #include "gni/gni.h"
 #include "gni/common/logger.h"
-#include "java/lang/integer.h"
 #include "java/lang/object.h"
 #include "java/lang/string.h"
 #include "java/lang/char_sequence.h"
@@ -103,8 +102,8 @@ Java_com_example_android_nativenotifications_MainActivity_showNotification(
 
     // Create a notification with a given title, content, and icon.
     Notification *notification = CreateNotification(context, channel_id,
-                                                    "Very Important Notification",
-                                                    "Your cat has run away again.", icon_id);
+                                                    "My Native Notification",
+                                                    "Hello!", icon_id);
 
     // Create a notification manager and use it to show the notification.
     NotificationManagerCompat *notification_manager = NotificationManagerCompat_from(context);

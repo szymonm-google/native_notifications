@@ -1,0 +1,59 @@
+{
+  "custom_classes": [
+    {
+      "class_name": "class java.lang.CharSequence"
+    },
+    {
+      "class_name": "class java.lang.Object",
+      "methods": [
+        "java.lang.String toString()"
+      ]
+    },
+    {
+      "class_name": "class java.lang.String"
+    },
+    {
+      "class_name": "class android.content.Context",
+      "methods": [
+        "java.lang.Object getSystemService(java.lang.String name)"
+      ]
+    },
+    {
+      "class_name": "class android.app.Notification"
+    },
+    {
+      "class_name": "class android.app.NotificationManager",
+      "methods": [
+        "void createNotificationChannel(android.app.NotificationChannel channel)"
+      ]
+    },
+    {
+      "class_name": "class android.app.NotificationChannel",
+      "methods": [
+        "NotificationChannel(java.lang.String id, java.lang.CharSequence name, int importance)",
+        "void setDescription(java.lang.String description)"
+      ]
+    },
+    {
+      "class_name": "class androidx.core.app.NotificationCompat"
+    },
+    {
+      "class_name": "class androidx.core.app.NotificationCompat$Builder",
+      "methods": [
+        "Builder(android.content.Context context, java.lang.String channelId)",
+        "androidx.core.app.NotificationCompat$Builder setContentText(java.lang.CharSequence text)",
+        "androidx.core.app.NotificationCompat$Builder setContentTitle(java.lang.CharSequence title)",
+        "androidx.core.app.NotificationCompat$Builder setSmallIcon(int icon)",
+        "androidx.core.app.NotificationCompat$Builder setPriority(int pri)",
+        "android.app.Notification build()"
+      ]
+    },
+    {
+      "class_name": "class androidx.core.app.NotificationManagerCompat",
+      "methods": [
+        "static androidx.core.app.NotificationManagerCompat from(android.content.Context context)",
+        "void notify(int id, android.app.Notification notification)"
+      ]
+    }
+  ]
+}
