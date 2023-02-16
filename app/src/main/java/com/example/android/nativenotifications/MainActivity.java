@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Call a native function that shows a notification.
         showNotification(R.mipmap.ic_launcher);
     }
 

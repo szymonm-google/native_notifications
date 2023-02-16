@@ -14,30 +14,69 @@
 #include "android/app/notification_manager.h"
 #include "android/app/notification_channel.h"
 
-#define GNI_CAST(DST_TYPE, SRC_TYPE, SRC_POINTER) DST_TYPE##_wrapJniReference(SRC_TYPE##_getJniReference(SRC_POINTER))
+const int32_t IMPORTANCE_HIGH = 4;  // NotificationManager.IMPORTANCE_HIGH
+const int32_t PRIORITY_MAX = 2;  // NotificationCompat.PRIORITY_MAX
+const int32_t NOTIFICATION_ID = 123;  // A user defined notification id.
+
+// Converts C string into CharSequence.
+CharSequence *CharSequenceFromCString(const char *text) {
+    String *string = String_fromCString(text);
+    // Cast String to CharSequence. In Java, a String implements CharSequence.
+    CharSequence *result = GNI_CAST(CharSequence, String, string);
+    // Casting creates a new object, so it needs to be destroyed as normal.
+    String_destroy(string);
+    return result;
+}
+
+// Creates a notification.
+Notification *
+CreateNotification(Context *context, String *channel_id, const char *title, const char *content,
+                   int32_t icon_id) {
+    // Convert C strings to CharSequence.
+    CharSequence *title_chars = CharSequenceFromCString(title);
+    CharSequence *content_chars = CharSequenceFromCString(content);
+
+    // Create a NotificationCompat.Builder and set all required properties.
+    NotificationCompat_Builder *notification_builder = NotificationCompat_Builder_construct(context,
+                                                                                            channel_id);
+    NotificationCompat_Builder_setContentTitle(notification_builder,
+                                               title_chars);
+    NotificationCompat_Builder_setContentText(notification_builder, content_chars);
+    NotificationCompat_Builder_setSmallIcon(notification_builder, icon_id);
+    NotificationCompat_Builder_setPriority(notification_builder, PRIORITY_MAX);
+
+    // Build a notification.
+    Notification *notification = NotificationCompat_Builder_build(notification_builder);
+
+    // Clean up allocated objects.
+    NotificationCompat_Builder_destroy(notification_builder);
+    CharSequence_destroy(title_chars);
+    CharSequence_destroy(content_chars);
+
+    return notification;
+}
 
 void CreateNotificationChannel(Context *context, String *channel_id) {
-
-    CharSequence *aaa =  GNI_CAST(CharSequence, String, String_fromCString("channel name"));
-
-    String *channel_name = String_fromCString("channel name");
+    CharSequence *channel_name = CharSequenceFromCString("channel name");
     String *channel_description = String_fromCString("channel description");
     String *system_service_name = String_fromCString("notification");
-    uint32_t importance = 4; // NotificationManager.IMPORTANCE_DEFAULT;
     NotificationChannel *channel = NotificationChannel_construct(channel_id,
-                                                                 CharSequence_wrapJniReference(
-                                                                         String_getJniReference(
-                                                                                 channel_name)),
-                                                                 importance);
+                                                                 channel_name,
+                                                                 IMPORTANCE_HIGH);
     NotificationChannel_setDescription(channel, channel_description);
-    NotificationManager *notification_manager = NotificationManager_wrapJniReference(
-            Object_getJniReference(Context_getSystemService(context, system_service_name)));
+
+    Object *notification_manager_as_object = Context_getSystemService(context,
+                                                                      system_service_name);
+    NotificationManager *notification_manager = GNI_CAST(NotificationManager, Object,
+                                                         notification_manager_as_object);
+
     NotificationManager_createNotificationChannel(notification_manager, channel);
 
-    String_destroy(channel_name);
+    CharSequence_destroy(channel_name);
     String_destroy(channel_description);
     String_destroy(system_service_name);
     NotificationChannel_destroy(channel);
+    Object_destroy(notification_manager_as_object);
     NotificationManager_destroy(notification_manager);
 }
 
@@ -49,39 +88,31 @@ Java_com_example_android_nativenotifications_MainActivity_showNotification(
 
     JavaVM *java_vm;
     env->GetJavaVM(&java_vm);
+
+    // Initialize the GNI runtime. This function needs to be called before any call to generated code.
     GniCore_init(java_vm, main_activity);
 
+    // Create a Context object by wrapping an existing JNI reference.
     Context *context = Context_wrapJniReference(main_activity);
 
+    // Create a String object.
     String *channel_id = String_fromCString("new_messages");
+
+    // Create a notification channel.
     CreateNotificationChannel(context, channel_id);
 
-    NotificationCompat_Builder *notification_builder = NotificationCompat_Builder_construct(context,
-                                                                                            channel_id);
-    String *title = String_fromCString("my title");
-    CharSequence *title_chars = CharSequence_wrapJniReference(
-            String_getJniReference(title));
-    String *content = String_fromCString("my content");
-    CharSequence *content_chars = CharSequence_wrapJniReference(
-            String_getJniReference(content));
-    NotificationCompat_Builder_setContentTitle(notification_builder,
-                                               title_chars);
-    NotificationCompat_Builder_setContentText(notification_builder, content_chars);
-    NotificationCompat_Builder_setSmallIcon(notification_builder, icon_id);
-    NotificationCompat_Builder_setPriority(notification_builder, 2);
+    // Create a notification with a given title, content, and icon.
+    Notification *notification = CreateNotification(context, channel_id,
+                                                    "Very Important Notification",
+                                                    "Your cat has run away again.", icon_id);
 
-    Notification *notification = NotificationCompat_Builder_build(notification_builder);
-
+    // Create a notification manager and use it to show the notification.
     NotificationManagerCompat *notification_manager = NotificationManagerCompat_from(context);
-    NotificationManagerCompat_notify(notification_manager, 11, notification);
+    NotificationManagerCompat_notify(notification_manager, NOTIFICATION_ID, notification);
 
+    // Destroy all objects.
     Context_destroy(context);
     String_destroy(channel_id);
-    NotificationCompat_Builder_destroy(notification_builder);
-    String_destroy(title);
-    CharSequence_destroy(title_chars);
-    String_destroy(content);
-    CharSequence_destroy(content_chars);
     Notification_destroy(notification);
     NotificationManagerCompat_destroy(notification_manager);
 }
