@@ -55,6 +55,5 @@ target_link_libraries( # Specifies the target library.
         # included in the NDK.
         ${log-lib})
 
-include_directories(./)
 include_directories(./native_wrappers/c)
 include_directories(./native_wrappers/cpp)
